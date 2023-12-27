@@ -1,23 +1,19 @@
-
-import  express  from 'express';
+import express from "express";
 import http from "http";
-import {Server} from "socket.io"
+import { Server } from "socket.io";
 import cors from "cors";
+import sockets from "./socket.js";
 
-
-const app = express()
-const port = 4000
+const app = express();
+const port = 4000;
 
 const httpServer = http.createServer(app);
 
-
-
-import path from "path"
-import { fileURLToPath } from 'url';
+import path from "path";
+import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 
 app.use(cors());
 
@@ -26,17 +22,16 @@ const io = new Server(httpServer, {
     origin: ["http://localhost:3000"],
   },
 });
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
-})
+app.get("/", (req, res) => {
+  res.sendFile(__dirname + "/index.html");
+});
 
-io.on("connection",(socket)=>{
-    //console.log("Connetion is ready");
-    socket.emit("hello", (message)=>{
-      console.log(message);
-    });
-    
-})
+io.on("connection", (socket) => {
+  //console.log("Connetion is ready");
+  socket.emit("hello", (message) => {
+    console.log(message);
+  });
+});
 
 io.on("connection", (socket) => {
   socket.on("send-message", (arg) => {
@@ -44,21 +39,12 @@ io.on("connection", (socket) => {
   });
 
   socket.on("new-room-created", (roomId, userId) => {
-    console.log(roomId, userId)
+    console.log(roomId, userId);
   });
-
-  socket.on('join', (roomId)=> {
-    console.log(roomId,"roomId");
-    socket.join(roomId, () => {
-      socket.to(roomId).emit('user-joined-room', socket.id);
-    });
-  });
-
-  
-
 });
 
+io.on("connection", sockets);
 
 httpServer.listen(port, () => {
-  console.log('server start at http://localhost:4000/')
-})
+  console.log("server start at http://localhost:4000/");
+});

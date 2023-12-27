@@ -48,11 +48,16 @@ export default function index() {
 
   useEffect(() => {
     if (!socket) return;
+    socket.emit("new-room-created", { roomId:router.query.id });
     socket.on("hello", (data) => {
       setChat((prev) => [...prev, { message: data.message, received: true }]);
+
     });
     socket.on("typing-started-from-server", () => setTyping(true));
     socket.on("typing-stoped-from-server", () => setTyping(false));
+
+
+    
     
   }, []);
 

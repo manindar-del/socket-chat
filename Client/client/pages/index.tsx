@@ -17,6 +17,7 @@ import { useRouter } from 'next/router';
 import { io } from "socket.io-client";
 import { useQuery } from "react-query";
 import { useState } from 'react';
+import { Cookies } from "react-cookie";
 
 function Copyright(props: any) {
   return (
@@ -37,6 +38,7 @@ function Copyright(props: any) {
 const defaultTheme = createTheme();
 
 export default function SignIn() {
+  const cookie = new Cookies();
 
     const [rooms, setRooms] = useState<string | unknown>("");
     console.log(rooms,"rooms");
@@ -51,6 +53,9 @@ export default function SignIn() {
     
     router.push(`/room/${roomId}`)
     socket.emit("new-room-created", { roomId, userId });
+    const data = new FormData(event.currentTarget)
+
+    console.log(data.get("name"),"test")
     
   };
 
@@ -64,7 +69,7 @@ export default function SignIn() {
   })
 
 
-console.log(data,"datadatadata");
+
 
 
   return (
