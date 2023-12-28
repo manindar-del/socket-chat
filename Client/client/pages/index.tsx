@@ -16,7 +16,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useRouter } from 'next/router';
 import { io } from "socket.io-client";
 import { useQuery } from "react-query";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Cookies } from "react-cookie";
 
 function Copyright(props: any) {
@@ -33,6 +33,10 @@ function Copyright(props: any) {
 }
 
 
+interface room {
+  roomId: string;
+  room:{room:[]}
+}
 
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
@@ -40,8 +44,7 @@ const defaultTheme = createTheme();
 export default function SignIn() {
   const cookie = new Cookies();
 
-    const [rooms, setRooms] = useState<string | unknown>("");
-    console.log(rooms,"rooms");
+    const [rooms, setRooms] = useState<room[]>([]);
     const router = useRouter();
     const socket = io("http://localhost:4000/");
 
@@ -60,16 +63,24 @@ export default function SignIn() {
   };
 
 
-   const {data} = useQuery({
-    queryKey: [],
-    queryFn: async () => {
-      const data = await fetch (`http://localhost:4000/${roomId}`)
-      return data
-    },
-  })
+  useEffect(() => {
+    async function fetchRooms() {
+      const res = await fetch("http://localhost:4000/rooms");
+      const { rooms } = await res.json();
+      setRooms(rooms);
+    }
+    fetchRooms();
+  }, []);
 
+  useEffect(() => {
+    if (!socket) return;
 
+    socket.on("new-room-created", ({ room }) => {
+      console.log(room,"room");
+      setRooms([...rooms, room]);
+    });
 
+  }, [socket]);
 
 
   return (
@@ -101,20 +112,7 @@ export default function SignIn() {
               autoComplete="name"
               autoFocus
             />
-            {/* <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-            /> */}
-            {/* <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            /> */}
+           
             <Button
               type="submit"
               fullWidth
@@ -123,18 +121,7 @@ export default function SignIn() {
             >
               Join
             </Button>
-            {/* <Grid container>
-              <Grid item xs>
-                <Link href="#" variant="body2">
-                  Forgot password?
-                </Link>
-              </Grid>
-              <Grid item>
-                <Link href="#" variant="body2">
-                  {"Don't have an account? Sign Up"}
-                </Link>
-              </Grid>
-            </Grid> */}
+            
           </Box>
         </Box>
         <Copyright sx={{ mt: 8, mb: 4 }} />

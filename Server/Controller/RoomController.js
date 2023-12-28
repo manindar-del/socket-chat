@@ -2,6 +2,7 @@ import Room from "../modal/Room.js";
 import BaseController from "./BaseController.js";
 export default class RoomController extends BaseController {
   joinRoom = ({ roomId }) => {
+    console.log(roomId,"roomId");
     this.socket.join(roomId);
   };
 

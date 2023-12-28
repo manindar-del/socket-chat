@@ -16,19 +16,18 @@ import { useRouter } from "next/router";
 
 interface chat {
   received: any;
-  message: { received: [] | any  } | any;
- 
-  
+  message: { received: [] | any } | any;
 }
 
 export default function index() {
   const socket = io("http://localhost:4000/");
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState<chat[]>([]);
+  
   const [typing, setTyping] = useState(false);
 
- const router = useRouter();
- console.log(router.query.id,"router");
+  const router = useRouter();
+  console.log(chat, "router");
 
   function handleForm(e: React.SyntheticEvent): void {
     e.preventDefault();
@@ -38,9 +37,6 @@ export default function index() {
     setMessage("");
   }
 
-
-
-
   function handleInput(e: React.SyntheticEvent | any): void {
     setMessage(e.target.value);
     //socket.emit("typing-started", {  });
@@ -48,26 +44,19 @@ export default function index() {
 
   useEffect(() => {
     if (!socket) return;
-    socket.emit("new-room-created", { roomId:router.query.id });
-    socket.on("hello", (data) => {
+    socket.emit("join-room", { roomId: router.query.id });
+
+    socket.on("message-from-server", (data) => {
       setChat((prev) => [...prev, { message: data.message, received: true }]);
-
     });
-    socket.on("typing-started-from-server", () => setTyping(true));
-    socket.on("typing-stoped-from-server", () => setTyping(false));
-
-
-    
-    
   }, []);
 
   return (
     <div>
-      
       <Box sx={{ marginBottom: 5 }}>
         {chat.map((data) => (
           <Typography
-            sx={{ textAlign: data.received ? "left" : "right" }}
+            sx={{ textAlign: data.received ? "right" : "left" }}
             key={data.message}
           >
             {data.message}

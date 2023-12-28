@@ -1,12 +1,13 @@
 
-
+import MessageController from "./Controller/MessageController.js";
 import RoomController from "./Controller/RoomController.js";
 const sockets = (socket) => {
     const roomController = new RoomController(socket);
+    const messageController = new MessageController(socket);
 
   socket.on("join-room", roomController.joinRoom);
   socket.on("new-room-created", roomController.newRoomCreated);
-  socket.on("room-removed", roomController.roomRemoved);
+  socket.on("send-message", messageController.sendMessage);
 
 
 

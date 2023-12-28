@@ -7,4 +7,6 @@ const roomsSchema = new Schema({
   userId: String,
 });
 
+
+
 export default mongoose.model("Room", roomsSchema);

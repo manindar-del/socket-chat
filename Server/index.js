@@ -3,9 +3,18 @@ import http from "http";
 import { Server } from "socket.io";
 import cors from "cors";
 import sockets from "./socket.js";
-
+import mongoose from "mongoose";
+import dotenv from 'dotenv';
+dotenv.config();
 const app = express();
 const port = 4000;
+
+
+await mongoose.connect(
+  `mongodb+srv://${process.env.username}:${process.env.password}@cluster0.4fhuqfa.mongodb.net/?retryWrites=true&w=majority`
+);
+
+
 
 const httpServer = http.createServer(app);
 
@@ -38,9 +47,7 @@ io.on("connection", (socket) => {
     console.log(arg);
   });
 
-  socket.on("new-room-created", (roomId, userId) => {
-    console.log(roomId, userId);
-  });
+ 
 });
 
 io.on("connection", sockets);
